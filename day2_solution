@@ -1,0 +1,10 @@
+file = File.read("day2_input")
+row = file.split("\n")
+row.map do  |r| 
+	rule, pass = r.split(":").map(&:strip)
+	freq, letter = rule.split(" ").map(&:strip)
+	freqMin,freqMax = freq.split("-").map(&:to_i)
+	pos1 = pass[freqMin-1]
+	pos2 = pass[freqMax-1]
+	puts pass if (pos1 == letter && pos2 != letter) || (pos1 != letter && pos2 == letter)	
+end

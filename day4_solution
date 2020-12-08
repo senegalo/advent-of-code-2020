@@ -1,0 +1,78 @@
+require 'json'
+passports_raw = File.read("day4_input").split("\n\n").map {|p| p.split("\n").map{ |p| p.split(" ")}.flatten}
+
+passports = passports_raw.map do |p|
+	p.map do |raw|
+		raw.split(":")
+	end.to_h
+end
+
+def is_valid(p) 
+	required = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+	return true if (required - p.keys).count == 0
+	false
+end
+
+def is_four_digit(d)
+	!(/^\d{4}$/.match(d).nil?)
+end
+
+def is_in_range(d, min, max) 
+	i = d.to_i
+	i >= min && i <= max
+end
+
+def is_byr_valid(d)
+	is_four_digit(d) && is_in_range(d, 1920, 2002)
+end
+
+def is_iyr_valid(d)
+	is_four_digit(d) && is_in_range(d, 2010, 2020)
+end
+
+def is_eyr_valid(d)
+	is_four_digit(d) && is_in_range(d, 2020, 2030)
+end
+
+def is_hgt_valid(h) 
+	match = /^(\d+)((cm|in))$/.match(h)
+	if !match.nil?
+		height = match[1].to_i
+		return true if (match[2] == "cm" && height >= 150 && height <= 193) || ( match[2] == "in" && height >= 59 && height <= 76)
+	end
+	false 
+end
+
+def is_hcl_valid(h)
+	!(/^#[0-9a-f]{6}$/.match(h).nil?)
+end
+
+def is_ecl_valid(e)
+	!(/^(amb|blu|brn|gry|grn|hzl|oth)$/.match(e).nil?)
+end
+
+def is_pid_valid(p)
+	!(/^\d{9}$/.match(p).nil?)
+end
+
+def is_cid_valid(p)
+	true
+end
+
+
+valid = 0
+
+passports.each do |p|
+	if is_valid(p)
+		verdict = 1
+		p.keys.each do |k|
+			if !send("is_#{k}_valid", p[k]) 
+				verdict = 0
+				break
+			end
+		end
+		valid += verdict
+	end
+end
+
+puts valid

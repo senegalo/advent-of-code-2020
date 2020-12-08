@@ -1,0 +1,28 @@
+input = File.read("day3_input").split("\n").map{|r| r.split("") }
+
+def counter(input,down, right, debug = false)
+	tree_count = 0
+
+	i = down
+	until i >= input.length do
+		row = input[i]
+		col = ((i/down)*right)%row.length
+		first = i == 0 && row[0] == "#"
+		other  = row[col] == "#"
+				   
+		tree_count += 1 if(first || other)
+		if debug
+			if i == 0  
+				print row[0]
+			else
+				print row[col]
+			end
+		end
+		i += down
+	end
+	puts tree_count if debug
+	tree_count
+end
+
+puts counter(input, 1, 1) * counter(input, 1, 3) * counter(input, 1, 5) * counter(input, 1, 7) * counter(input, 2, 1, true)
+# 

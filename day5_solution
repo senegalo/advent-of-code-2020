@@ -1,0 +1,39 @@
+require "json"
+input = File.read("day5_input").split("\n").map{|l| l.split("")}
+
+def reduce(seg, l, h, l_label, h_label, debug = false)
+	p seg if debug
+	seg.each do |i|
+		h = (h.to_f - (h - l)/2.0).floor if i == l_label
+		l = (l + (h - l)/2.0).ceil if i == h_label
+		puts "#{l} - #{h}" if debug
+	end
+	if seg.last == l_label
+		puts "result: #{h}" if debug
+		h	
+	else
+		puts "result: #{l}" if debug
+		l
+	end
+end
+
+max_seat_id = 0
+# input = ["BFFFBBFRRR", "FFFBBBFRRR", "BBFFBBFRLL", "FBFBBFFRLR"].map{|r| r.split("")}
+
+seats_taken = []
+
+input.each do |bp|
+	row = reduce(bp.slice(0, 7), 0, 127, "F", "B")
+	col = reduce(bp.slice(7, 3), 0, 7, "L", "R")	
+	seat_id = row*8 + col
+	max_seat_id = seat_id if seat_id > max_seat_id
+	seats_taken << seat_id
+end
+seats_taken.sort!
+seats_taken.each_with_index do |s, index| 
+	puts "#{s} - #{seats_taken[index + 1]}"
+	if seats_taken[index+1] - s > 1
+		puts s + 1   
+		break
+	end
+end

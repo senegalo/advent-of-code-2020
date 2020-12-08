@@ -1,0 +1,10 @@
+require 'json'
+input = File.read("day6_input").split("\n\n").map {|g| g.split("\n").map{|g| g.split("")  }  }
+
+out = input.map do |g|
+	g.inject(g.first) do |intersect, per|
+		intersect & per
+	end.count
+end
+
+puts out.sum

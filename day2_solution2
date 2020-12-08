@@ -1,0 +1,12 @@
+file = File.read("day2_input")
+row = file.split("\n")
+row.map do  |r| 
+	char_count = 0
+	rule, pass = r.split(":").map(&:strip)
+	freq, letter = rule.split(" ").map(&:strip)
+	freqMin,freqMax = freq.split("-").map(&:to_i)
+	pass.split("").each do |char|
+		char_count += 1 if char == letter
+	end
+	puts pass if char_count >= freqMin && char_count <= freqMax
+end

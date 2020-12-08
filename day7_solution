@@ -1,0 +1,57 @@
+require 'json'
+@rules  = File.read("day7_input").gsub(/bags?/, "").gsub(".","").split("\n").map do |r|
+	bag, rules = r.split(" contain ")
+	rules = rules.split(",").map do |rule|
+		if rule.strip == "no other" 
+			["NO", 1]
+		else
+			match = /^(\d+)\s(.*)$/.match(rule.strip)
+			[match[2], match[1].to_i]
+		end
+	end.to_h
+	[bag.strip, rules]
+end.to_h
+
+combo = 0
+
+def yalla(bag)
+	@rules[bag].each do |k, count|
+		if k == "NO"
+			return false
+		elsif k == "shiny gold"
+			return true
+		else
+			return true if yalla(k)
+		end
+	end
+	return false
+end
+
+def sum(bag) 
+	acc = 0
+	puts "#{bag} contains"
+	@rules[bag].each do |k, count|
+		puts ">> #{count} of #{k}"
+		if k == "NO"		
+			acc 
+		else
+			acc += count + count * sum(k)
+		end
+		puts "acc is #{acc}"
+	end
+	acc
+end
+=begin
+@rules.keys.each do |b| 
+	next if b == "shiny gold"
+	combo += 1 if yalla(b)
+end
+
+
+
+puts @rules.to_json
+puts combo
+=end
+s = sum("shiny gold")
+
+puts s

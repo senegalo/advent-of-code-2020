@@ -1,0 +1,15 @@
+ns = File.read("day1_input").split("\n").map(&:to_i)
+ns.each { |a| 
+	ns.each { |b| 
+		ns.each { |c|
+			if a+b+c == 2020 
+				puts a
+				puts b
+				puts c
+				puts a+b+c
+				puts a*b*c
+			end
+		}
+	} 
+}
+

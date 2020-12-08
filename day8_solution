@@ -1,0 +1,46 @@
+require 'json'
+
+potential = []
+input = File.read("day8_input").split("\n").map do |l| 
+	inst, param = l.split(" ")
+	[inst, param.to_i]
+end
+.each_with_index do |cmd, i| 
+	potential << i if cmd[0] == "jmp" || (cmd[0] == "nop" && cmd[1] != 0)
+end
+
+
+def terminates(input)
+	executed = {}
+	acc = 0
+	line = 0
+	while true do
+		return [true, acc] if line >= input.length
+		return [false, acc] if executed[line] 
+		executed[line] = true
+			
+		command, param = input[line]
+
+		if command == "jmp"
+			line = line + param
+		else
+			acc += param if command == "acc"
+			line += 1
+		end
+	end 
+end
+
+
+potential.each do |line|
+	original = input[line][0]
+	changed = original == "jmp" ? "nop" : "jmp"
+	input[line][0] = changed
+	success, acc = terminates(input)
+	if success
+		puts acc
+		break
+	else
+		input[line][0] = original
+	end
+end
+
