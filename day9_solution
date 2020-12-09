@@ -1,0 +1,56 @@
+input = File.read("day9_input").split("\n").map(&:to_i)
+
+preamble = 25
+
+def has_sum(preamble, sum_for, debug=false) 
+	preamble.sort!
+	puts "#{preamble}, #{sum_for}" if debug
+	min = 0
+	max = preamble.length-1
+	while(min >= 0 && min < max && max < preamble.length) do 
+		curr_sum = preamble[min] + preamble[max]
+		puts ">>pmin:#{preamble[min]},pmax:#{preamble[max]}, curr:#{curr_sum}"  if debug
+		return true if curr_sum == sum_for
+		min += 1 if curr_sum < sum_for
+		max -= 1 if curr_sum > sum_for
+		puts ">>min: #{min}, max:#{max}" if debug
+	end
+	false
+end
+
+def sum_range(input, sum_for)
+	min = 0
+	max = 1
+	sum_arr = [input[0], input[1]]
+	while(min >= 0 && min < max && max < input.length) do
+		sum = sum_arr.sum
+		if sum > sum_for
+			sum_arr.shift
+			min += 1
+		elsif sum < sum_for
+			max += 1
+			sum_arr << input[max]
+		else
+			return [sum_arr.min, sum_arr.max, sum_arr]
+		end
+	end
+end
+
+
+current = preamble
+
+sol1 = -1
+while(current <= input.length+1) do
+	pre = input.slice(current-preamble, preamble) 
+	if !has_sum(pre, input[current])
+		sol1 = input[current]
+		puts sol1
+		sol2 = sum_range(input, sol1)
+		p sol2
+		puts sol2[0]+sol2[1]
+		break
+	end
+	current += 1
+end
+
+
