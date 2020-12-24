@@ -1,0 +1,142 @@
+require 'json'
+require 'byebug'
+input = File.read("day11_input").split("\n").map { |r| r.split("") }
+
+def lim(i, input) 
+	return true if i >=0 && i < input.length
+	false
+end
+
+def compute(x, y, input) 
+	total = 0
+	return "." if input[y][x] == "."
+	(-1..1).each do |cx|
+		(-1..1).each do |cy|
+			next if(cy == 0 && cx == 0)
+			inc_x = cx+x
+			inc_y = cy+y
+			total += 1 if(lim(y+cy, input) && lim(x+cx, input[0]) && input[cy+y][cx+x] == "#")	
+			return "L" if(input[y][x] == "#" && total >= 4)
+		end
+	end
+	return "#" if(total == 0)
+	input[y][x]
+end
+
+def brint x
+	puts x.map{ |r| r.join("") }.join("\n")
+	puts "============================"
+end
+
+def count_occu result
+	result.inject(0) do |racc, r|
+		racc + r.inject(0) do |cacc, c|
+			c == "#" ? cacc+1 : cacc
+		end
+	end
+end
+
+def check_diag(x, y, input, xdirr, ydirr)
+	occupied = 0
+
+	currx = x + xdirr
+	curry = y + ydirr
+	curr = "."
+	xmax = input[0].length - 1 
+	ymax = input.length - 1
+
+	while(currx.between?(0, xmax) && curry.between?(0, ymax))  do 
+		curr = input[curry][currx]	
+		break if curr == "L" || curr == "#"	
+		currx +=  xdirr
+		curry +=  ydirr
+	end
+	occupied = 1 if curr == "#"
+	occupied
+end
+
+def chicken(x,y,input)
+	sum = 0
+	(-1..1).each do |lx|
+		(-1..1).each do |ly|
+			next if lx == 0 && ly == 0
+			sum += check_diag(x, y, input, lx, ly)
+		end
+	end
+	sum
+end
+
+def clone_arr(a)
+	Marshal.load( Marshal.dump(a) )
+end
+
+def evaluate(x, y, input)
+	return "." if input[y][x] == "."
+	occupied = 0
+	occupied += chicken(x, y, input)	
+	if occupied >= 5 && input[y][x] == "#" 
+		return "L"
+	elsif(occupied == 0 && input[y][x] == "L")
+		return "#"
+	else
+		return input[y][x]
+	end
+end
+
+puts "##################### Solution 1"
+=begin
+brint input
+
+calculated = []
+previous = clone_arr(input)
+steps = 0
+
+while(true) do 
+	(0..previous.length-1).each do |y|
+		(0..previous[0].length-1).each do |x|
+			calculated[y] ||= []
+			calculated[y][x] = compute(x, y, previous)
+		end
+	end
+
+	steps += 1
+
+	break if previous == calculated
+	previous = clone_arr(calculated)
+
+end
+
+puts count_occu calculated
+
+puts steps
+
+=end
+puts"############################ Solution 2"
+brint input
+
+calculated = []
+previous = input
+steps = 0
+
+while(true) do 
+	(0..previous.length-1).each do |y|
+		(0..previous[0].length-1).each do |x|
+			calculated[y] ||= []
+			calculated[y][x] = evaluate(x, y, previous)
+		end
+	end
+
+	steps += 1
+	brint(calculated)
+
+	break if previous == calculated
+	previous = clone_arr(calculated)
+
+end
+
+puts count_occu calculated
+
+puts steps
+
+puts "################ DEBUG"
+puts chicken(1, 1, input)

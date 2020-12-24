@@ -1,0 +1,52 @@
+require 'byebug'
+input = File.read("day10_test").split("\n").map(&:to_i).sort
+
+result = [[], [], []]
+
+curr = 0
+
+input.each do |i|
+	diff = i - curr	
+	if diff >= 1 && diff <= 3
+		result[diff-1] << i		
+	elsif diff > 3
+		break
+	end
+	curr = i
+end
+
+def can_work(diff)
+	diff >= 1 && diff <= 3
+end
+
+def calc(input, i=0, curr = 0, step = 0, debug = false)
+	posibilities = 1
+#	byebug if step == 26 && i == 95
+	while( i < input.length) do 
+		diff = input[i] - curr	
+		diff_next = input[i+1].nil? ? 4 : input[i+1] - curr
+		puts "S #{step}: curr #{curr}, i #{i}, i[i] #{input[i]}, i[i+1] #{input[i+1]}, diff #{diff}, diffN #{diff_next}, p #{posibilities}" if debug
+		if can_work(diff) 
+			posibilities += calc(input, i+1, curr, step+1, debug) if can_work(diff_next)
+=begin
+			z = i+1
+			while (z < input.length && input[z]-curr <= 3) do
+				posibilities += 1
+				z += 1
+			end
+=end
+			curr = input[i]
+		end
+
+		break if diff > 3
+		i += 1
+	end
+	posibilities
+end
+
+p input
+p result
+puts "1: #{result[0].length} 2: #{result[1].length} 3: #{result[2].length+1}" 
+puts result[0].length * (result[2].length+1)
+
+#puts calc(input, 0, 0, 0, false)
