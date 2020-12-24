@@ -1,0 +1,92 @@
+require 'byebug'
+input = File.read("day12_input").split("\n").map do |i|
+	m = /^([A-Z])(\d*)$/.match(i)
+	[m[1], m[2].to_i]
+end
+
+########## Solution 1
+
+x = 0
+y = 0
+d = ["E", "S", "W", "N"]
+
+
+
+input.each do |i|
+	com, delta = i
+	
+	if com == "F"
+		com = d[0]
+	end
+
+	if com == "L"
+		(delta/90).times do |s|
+			d.unshift(d.pop)
+		end
+	elsif com == "R"
+		(delta/90).times do |s|
+			d.push(d.shift)
+		end
+	elsif com == "N"
+		y -= delta
+	elsif com == "S"
+		y+= delta
+	elsif com == "W"
+		x -= delta
+	elsif com == "E"
+		x+= delta
+	end
+end
+
+puts "Manhatten: #{x.abs + y.abs}"
+
+
+
+################ Solution 2
+
+wpx = 10
+wpy = 1 
+x = 0
+y = 0
+d = [[1,1], [-1, 1], [-1,-1], [1, -1]]
+
+def ns(i) 
+	out = "#{i.abs}"
+	out += (i <= 0 ? "S" : "N")
+end
+
+def ew(i)
+	"#{i.abs}#{i <= 0 ? "W" : "E"}"
+end
+
+def rotate(inx, iny, deg)
+	rad = deg * Math::PI / 180
+	outx = inx * Math.cos(rad).round - iny * Math.sin(rad)
+	outy = inx * Math.sin(rad) + iny * Math.cos(rad)
+	[outx.round, outy.round]
+end
+
+
+input.each do |i|
+	com, delta = i
+	
+	if com == "F"
+		x += delta * wpx
+		y += delta * wpy
+	elsif com == "L"
+		wpx, wpy = rotate(wpx, wpy,delta)
+	elsif com == "R"
+		wpx, wpy = rotate(wpx, wpy, -1 *  delta)
+	elsif com == "N"
+		wpy += delta
+	elsif com == "S"
+		wpy -= delta
+	elsif com == "W"
+		wpx -= delta
+	elsif com == "E"
+		wpx += delta
+	end
+	puts "ins: #{i} wpx: #{ew(wpx)} wpy: #{ns(wpy)} x: #{ew(x)} y: #{ns(y)}"
+end
+
+puts "Manhatten: #{x.abs + y.abs}"
